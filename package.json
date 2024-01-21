@@ -1,5 +1,5 @@
 {
-  "name": "Helping Hand",
+  "name": "backend",
   "version": "2.0.0",
   "description": "Doctor appointment",
   "main": "server.js",

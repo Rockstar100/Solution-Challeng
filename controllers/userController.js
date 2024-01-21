@@ -5,8 +5,13 @@ const Doctor = require("../models/doctorModel");
 const Appointment = require("../models/appointmentModel");
 
 const getuser = async (req, res) => {
+
   try {
-    const user = await User.findById(req.params.id).select("-password");
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(500).send("User not found");
+    }
+    console.log(user);
     return res.send(user);
   } catch (error) {
     res.status(500).send("Unable to get user");
@@ -51,7 +56,7 @@ const login = async (req, res) => {
 };
 
 const register = async (req, res) => {
-  console.log(req.body);
+ 
   try {
     const emailPresent = await User.findOne({ email: req.body.email });
     if (emailPresent) {
@@ -60,7 +65,7 @@ const register = async (req, res) => {
     const hashedPass = await bcrypt.hash(req.body.password, 10);
     const user = await User({ ...req.body, password: hashedPass });
     const result = await user.save();
-    console.log(result);
+   
     if (!result) {
       return res.status(500).send("Unable to register user");
     }

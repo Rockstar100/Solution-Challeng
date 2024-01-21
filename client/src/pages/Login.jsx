@@ -48,6 +48,7 @@ function Login() {
           loading: "Logging user...",
         }
       );
+      console.log(data);
       localStorage.setItem("token", data.token);
       dispatch(setUserInfo(jwt_decode(data.token).userId));
       getUser(jwt_decode(data.token).userId);

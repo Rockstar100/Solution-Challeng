@@ -12,8 +12,11 @@ axios.defaults.baseURL = process.env.REACT_APP_SERVER_DOMAIN;
 
 function Profile() {
   const { userId } = jwt_decode(localStorage.getItem("token"));
+  
   const dispatch = useDispatch();
   const { loading } = useSelector((state) => state.root);
+  const { userInfo } = useSelector((state) => state.root);
+  console.log(userInfo);
   const [file, setFile] = useState("");
   const [formDetails, setFormDetails] = useState({
     firstname: "",
@@ -27,10 +30,16 @@ function Profile() {
     confpassword: "",
   });
 
-  const getUser = async () => {
+  const getUser = async (id) => {
     try {
       dispatch(setLoading(true));
-      const temp = await fetchData(`/user/getuser/${userId}`);
+      console.log("Fetching user data...");
+      console.log(userId);
+      const res = await fetchData(`/user/getuser/${id}`);
+      const temp = res.data; // Access the data property
+  
+      console.log("Fetched user data:", temp);
+  
       setFormDetails({
         ...temp,
         password: "",
@@ -38,10 +47,15 @@ function Profile() {
         mobile: temp.mobile === null ? "" : temp.mobile,
         age: temp.age === null ? "" : temp.age,
       });
+  
       setFile(temp.pic);
       dispatch(setLoading(false));
-    } catch (error) {}
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
   };
+  
+  
 
   useEffect(() => {
     getUser();
@@ -69,18 +83,6 @@ function Profile() {
         password,
         confpassword,
       } = formDetails;
-
-      if (!email) {
-        return toast.error("Email should not be empty");
-      } else if (firstname.length < 3) {
-        return toast.error("First name must be at least 3 characters long");
-      } else if (lastname.length < 3) {
-        return toast.error("Last name must be at least 3 characters long");
-      } else if (password.length < 5) {
-        return toast.error("Password must be at least 5 characters long");
-      } else if (password !== confpassword) {
-        return toast.error("Passwords do not match");
-      }
       await toast.promise(
         axios.put(
           "/user/updateprofile",
